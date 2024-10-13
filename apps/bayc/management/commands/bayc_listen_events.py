@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from ...exceptions import InfuraConnectionFailed
+from ...tasks import process_bayc_transfer_events
 
 
 class Command(BaseCommand):
@@ -44,6 +45,5 @@ class Command(BaseCommand):
         smart_contract = self.get_smart_contract()
         events = smart_contract.events.Transfer.create_filter(from_block="latest")
         while True:
-            for event in events.get_new_entries():
-                pass
+            process_bayc_transfer_events(events=events.get_new_entries())
             time.sleep(3)
