@@ -1,5 +1,3 @@
-import time
-
 from .base import BAYCBaseCommand
 from ...tasks import process_bayc_transfer_events
 
