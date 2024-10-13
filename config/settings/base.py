@@ -56,6 +56,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "django_celery_beat",
     "django_celery_results",
+    "rest_framework",
 ]
 
 LOCAL_APPS = [
@@ -161,3 +162,15 @@ CELERY_BROKER_URL = "amqp://{}:{}@{}:{}/{}".format(
     get_env_variable("RABBITMQ_PORT"),
     get_env_variable("RABBITMQ_DEFAULT_VHOST"),
 )
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "PAGE_SIZE": 10
+}
