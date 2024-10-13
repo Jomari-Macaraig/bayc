@@ -1,0 +1,6 @@
+django
+djangorestframework
+psycopg2-binary
+django-celery-beat==2.5.0
+django_celery_results==2.4.0
+web3
