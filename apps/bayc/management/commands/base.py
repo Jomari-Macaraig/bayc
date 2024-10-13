@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from web3 import Web3
 
-from ...exceptions import InfuraConnectionFailed
+from ...exceptions import InfuraConnectionFailed, InvalidContractAddress, InvalidABI
 
 
 class BAYCBaseCommand(BaseCommand):
@@ -16,27 +16,40 @@ class BAYCBaseCommand(BaseCommand):
 
     def get_provider(self):
         w3 = Web3(Web3.HTTPProvider(self.get_infura_endpoint()))
+
+        if not w3.is_connected():
+            raise InfuraConnectionFailed("Infura connection failed, please check configuration")
+
         return w3
 
     @staticmethod
+    def get_contract_address():
+        try:
+            contract_address = Web3.to_checksum_address(settings.BAYC_CONTRACT_ADDRESS)
+        except Exception as e:
+            raise InvalidContractAddress("Please check your contract address")
+        return contract_address
+
+    @staticmethod
     def get_abi():
-        with open(settings.ABI_FILE) as f:
-            abi = json.load(f)
+        try:
+            with open(settings.ABI_FILE) as f:
+                abi = json.load(f)
+        except json.decoder.JSONDecodeError:
+            raise InvalidABI("Please check your ABI file")
         return abi
 
     def get_smart_contract(self):
         w3 = self.get_provider()
 
-        if not w3.is_connected():
-            raise InfuraConnectionFailed("Infura connection failed, please check configuration")
-
         abi = self.get_abi()
-        contract_address = w3.to_checksum_address(settings.BAYC_CONTRACT_ADDRESS)
+        contract_address = self.get_contract_address()
         smart_contract = w3.eth.contract(address=contract_address, abi=abi)
 
         return smart_contract
 
-    def serialize_events(self, events):
+    @staticmethod
+    def serialize_events(events):
         serialized_events = []
         for event in events:
             serialized_events.append({
