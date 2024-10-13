@@ -54,6 +54,8 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "django_celery_beat",
+    "django_celery_results",
 ]
 
 LOCAL_APPS = [
@@ -149,3 +151,13 @@ INFURA_URI = get_env_variable("INFURA_URI")
 INFURA_API_KEY = get_env_variable("INFURA_API_KEY")
 ABI_FILE = get_env_variable("ABI_FILE")
 BAYC_CONTRACT_ADDRESS = get_env_variable("BAYC_CONTRACT_ADDRESS")
+
+# CELERY CONFIGURATION
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_BROKER_URL = "amqp://{}:{}@{}:{}/{}".format(
+    get_env_variable("RABBITMQ_DEFAULT_USER"),
+    get_env_variable("RABBITMQ_DEFAULT_PASS"),
+    get_env_variable("RABBITMQ_HOST"),
+    get_env_variable("RABBITMQ_PORT"),
+    get_env_variable("RABBITMQ_DEFAULT_VHOST"),
+)

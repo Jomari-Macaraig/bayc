@@ -38,6 +38,18 @@ class Command(BaseCommand):
 
         return smart_contract
 
+    def serialize_events(self, events):
+        serialized_events = []
+        for event in events:
+            serialized_events.append({
+                "token_id": event.args["tokenId"],
+                "from_address": Web3.to_checksum_address(event.args["from"]),
+                "to_address": Web3.to_checksum_address(event.args["to"]),
+                "transaction_hash": event["transactionHash"].to_0x_hex(),
+                "block_number": event["blockNumber"],
+            })
+        return serialized_events
+
     def handle(self, *args, **options):
         self.stdout.write(
             self.style.SUCCESS("Listening for events")
@@ -45,5 +57,7 @@ class Command(BaseCommand):
         smart_contract = self.get_smart_contract()
         events = smart_contract.events.Transfer.create_filter(from_block="latest")
         while True:
-            process_bayc_transfer_events(events=events.get_new_entries())
+            process_bayc_transfer_events.apply_async(
+                kwargs={"events": self.serialize_events(events=events.get_new_entries())}
+            )
             time.sleep(3)
