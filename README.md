@@ -81,6 +81,10 @@ $ python manage.py runserver 0.0.0.0:8000
 1. *__api/v1/bayc/__* - list all Transfer events
 2. *__api/v1/bayc/<int: token_id>__* - list all related Transfer events to the token_id provided.
 
+Example:
+```commandline
+$ python manage.py bayc_process_past_events --from_block 20954016 --to_block 20955016
+```
 
 ### NOTE:
 You can uncomment the postgres configuration in the config.settings.development to use postgres as database
